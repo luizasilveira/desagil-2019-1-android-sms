@@ -10,6 +10,17 @@ import android.widget.Toast;
 
 public class SMSActivity extends AppCompatActivity {
 
+    // Método de conveniência para mostrar uma bolha de texto.
+    private void showToast(String text) {
+
+        // Constrói uma bolha de duração curta.
+        Toast toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+
+        // Mostra essa bolha.
+        toast.show();
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,26 +32,30 @@ public class SMSActivity extends AppCompatActivity {
 
         buttonSend.setOnClickListener((view) -> {
             String message = textMessage.getText().toString();
+
+            if (message.isEmpty()) {
+                showToast("Mensagem inválida!");
+                return;
+            }
+
             String phone = textPhone.getText().toString();
 
             // Esta verificação do número de telefone é bem
             // rígida, pois exige até mesmo o código do país.
-            if (PhoneNumberUtils.isGlobalPhoneNumber(phone)) {
-
-                // Enviar uma mensagem de SMS. Por simplicidade,
-                // não estou verificando se foi mesmo enviada.
-                SmsManager manager = SmsManager.getDefault();
-                manager.sendTextMessage(phone, null, message, null, null);
-
-                // Limpar o campo para nenhum engraçadinho
-                // ficar apertando o botão várias vezes.
-                textPhone.setText("");
-            } else {
-
-                // Mostrar uma bolha de texto com duração curta.
-                Toast toast = Toast.makeText(this, "Número inválido!", Toast.LENGTH_SHORT);
-                toast.show();
+            if (!PhoneNumberUtils.isGlobalPhoneNumber(phone)) {
+                showToast("Número inválido!");
+                return;
             }
+
+            // Enviar uma mensagem de SMS. Por simplicidade,
+            // não estou verificando se foi mesmo enviada,
+            // mas é possível fazer uma versão que verifica.
+            SmsManager manager = SmsManager.getDefault();
+            manager.sendTextMessage(phone, null, message, null, null);
+
+            // Limpar o campo para nenhum engraçadinho
+            // ficar apertando o botão várias vezes.
+            textPhone.setText("");
         });
     }
 }
